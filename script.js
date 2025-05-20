@@ -1,6 +1,10 @@
 //your code here
 const imageSources = [
-  "img1.jpg", "img2.jpg", "img3.jpg", "img4.jpg", "img5.jpg"
+  "img1.jpg",
+  "img2.jpg",
+  "img3.jpg",
+  "img4.jpg",
+  "img5.jpg"
 ];
 
 const tilesContainer = document.getElementById("tiles");
@@ -21,33 +25,32 @@ function setupTiles() {
   selectedTiles = [];
   resetBtn.style.display = "none";
   verifyBtn.style.display = "none";
-
   tilesContainer.innerHTML = "";
 
-  // Step 1: Choose a duplicate randomly
+  // Step 1: Random duplicate
   const duplicateIndex = Math.floor(Math.random() * imageSources.length);
   const duplicateImage = imageSources[duplicateIndex];
 
-  // Step 2: Create image list
-  const imageList = [...imageSources, duplicateImage]; // now 6 images
+  // Step 2: Create shuffled image list (5 unique + 1 duplicate)
+  const imageList = [...imageSources, duplicateImage];
   const shuffledImages = shuffle(imageList);
 
-  // Step 3: Render
-  shuffledImages.forEach((src, index) => {
+  // Step 3: Render images
+  shuffledImages.forEach((src) => {
     const img = document.createElement("img");
     img.src = src;
     img.dataset.src = src;
-    img.classList.add("tile");
+
+    const className = src.split(".")[0]; // e.g., 'img1' from 'img1.jpg'
+    img.classList.add("tile", className);
 
     img.addEventListener("click", () => handleTileClick(img));
-
     tilesContainer.appendChild(img);
   });
 }
 
 // Handle tile click
 function handleTileClick(tile) {
-  // Prevent re-selecting same tile
   if (tile.classList.contains("selected") || selectedTiles.length === 2) return;
 
   tile.classList.add("selected");
@@ -60,7 +63,7 @@ function handleTileClick(tile) {
   }
 }
 
-// Reset state
+// Reset functionality
 resetBtn.addEventListener("click", () => {
   selectedTiles.forEach(tile => tile.classList.remove("selected"));
   selectedTiles = [];
@@ -69,7 +72,7 @@ resetBtn.addEventListener("click", () => {
   message.textContent = "";
 });
 
-// Verify selection
+// Verify functionality
 verifyBtn.addEventListener("click", () => {
   const [img1, img2] = selectedTiles;
 
