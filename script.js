@@ -3,57 +3,76 @@ const imageSources = [
   "img1.jpg", "img2.jpg", "img3.jpg", "img4.jpg", "img5.jpg"
 ];
 
-let tilesContainer = document.getElementById("tiles");
-let resetBtn = document.getElementById("reset");
-let verifyBtn = document.getElementById("verify");
-let message = document.getElementById("para");
+const tilesContainer = document.getElementById("tiles");
+const resetBtn = document.getElementById("reset");
+const verifyBtn = document.getElementById("verify");
+const message = document.getElementById("para");
+
 let selectedTiles = [];
 
-function shuffleArray(arr) {
+// Utility: Shuffle array
+function shuffle(arr) {
   return arr.sort(() => Math.random() - 0.5);
 }
 
-function loadImages() {
-  // Step 1: Select a random image to duplicate
+// Setup images
+function setupTiles() {
+  message.textContent = "";
+  selectedTiles = [];
+  resetBtn.style.display = "none";
+  verifyBtn.style.display = "none";
+
+  tilesContainer.innerHTML = "";
+
+  // Step 1: Choose a duplicate randomly
   const duplicateIndex = Math.floor(Math.random() * imageSources.length);
   const duplicateImage = imageSources[duplicateIndex];
 
-  // Step 2: Create a new array with the duplicate added
-  const allImages = [...imageSources, duplicateImage];
+  // Step 2: Create image list
+  const imageList = [...imageSources, duplicateImage]; // now 6 images
+  const shuffledImages = shuffle(imageList);
 
-  // Step 3: Shuffle the array
-  const shuffledImages = shuffleArray(allImages);
-
-  // Step 4: Render image elements
-  tilesContainer.innerHTML = "";
+  // Step 3: Render
   shuffledImages.forEach((src, index) => {
     const img = document.createElement("img");
     img.src = src;
-    img.className = "tile";
     img.dataset.src = src;
-    img.addEventListener("click", () => onTileClick(img));
+    img.classList.add("tile");
+
+    img.addEventListener("click", () => handleTileClick(img));
+
     tilesContainer.appendChild(img);
   });
 }
 
-function onTileClick(imgElement) {
-  if (selectedTiles.length === 2) return;
+// Handle tile click
+function handleTileClick(tile) {
+  // Prevent re-selecting same tile
+  if (tile.classList.contains("selected") || selectedTiles.length === 2) return;
 
-  if (!selectedTiles.includes(imgElement)) {
-    imgElement.classList.add("selected");
-    selectedTiles.push(imgElement);
+  tile.classList.add("selected");
+  selectedTiles.push(tile);
 
-    // Show reset button
-    resetBtn.style.display = "inline-block";
-  }
+  resetBtn.style.display = "inline-block";
 
   if (selectedTiles.length === 2) {
     verifyBtn.style.display = "inline-block";
   }
 }
 
+// Reset state
+resetBtn.addEventListener("click", () => {
+  selectedTiles.forEach(tile => tile.classList.remove("selected"));
+  selectedTiles = [];
+  resetBtn.style.display = "none";
+  verifyBtn.style.display = "none";
+  message.textContent = "";
+});
+
+// Verify selection
 verifyBtn.addEventListener("click", () => {
   const [img1, img2] = selectedTiles;
+
   if (img1.dataset.src === img2.dataset.src) {
     message.textContent = "You are a human. Congratulations!";
   } else {
@@ -63,13 +82,4 @@ verifyBtn.addEventListener("click", () => {
   verifyBtn.style.display = "none";
 });
 
-resetBtn.addEventListener("click", () => {
-  selectedTiles.forEach(tile => tile.classList.remove("selected"));
-  selectedTiles = [];
-  verifyBtn.style.display = "none";
-  resetBtn.style.display = "none";
-  message.textContent = "";
-});
-
-// Initial page load
-loadImages();
+setupTiles();
